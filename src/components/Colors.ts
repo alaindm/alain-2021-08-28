@@ -1,0 +1,13 @@
+export const Colors = {
+  // WHITE: "#C6C7CC",
+  WHITE: "#f7f7f7",
+  VIOLET: "#5741D9",
+  DARK_GRAY: "#121723",
+  GRAY: "#4E5461",
+  LIGHT_GRAY: "#B3B7BE",
+  DARK_GREEN: "#113534",
+  LIGHT_GREEN: "#14A470",
+  DARK_RED: "#3D1D28",
+  RED: "#B91D1D",
+  LIGHT_RED: "#C33537",
+};

@@ -78,7 +78,8 @@ export const OrderBook = () => {
       setError(null);
 
       timerId = setInterval(() => arrageBookViewState(), 3000);
-
+      // remove later
+      setTimeout(() => clearInterval(timerId), 5000);
       console.log("subscribing to", productId);
       ws.send(
         JSON.stringify({

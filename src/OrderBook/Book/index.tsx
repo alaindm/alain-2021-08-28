@@ -69,6 +69,7 @@ export const BookComponent = ({
           orderType={OrderType.BID}
           totalBarSide={TotalBarSide.LEFT}
           levels={bidsGroupedByPriceLevel}
+          highestTotal={highestTotal}
         />
       </div>
       <div
@@ -94,6 +95,7 @@ export const BookComponent = ({
           orderType={OrderType.ASK}
           totalBarSide={TotalBarSide.RIGHT}
           levels={asksGroupedByPriceLevel}
+          highestTotal={highestTotal}
         />
       </div>
     </div>

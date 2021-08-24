@@ -44,24 +44,33 @@ export const OrderBook = () => {
     setBookViewState(bookStateRef.current);
 
     // TODO : Put spread calcs in a helper func
-    const bestBid = Math.max(
-      ...bookStateRef.current.bids.map((order) => order[0])
-    );
-    const bestAsk = Math.min(
-      ...bookStateRef.current.asks.map((order) => order[0])
-    );
+    if (bookStateRef.current.bids.length && bookStateRef.current.asks.length) {
+      const bestBid = Math.max(
+        ...bookStateRef.current.bids.map((order) => order[0])
+      );
 
-    const spread = bestAsk - bestBid;
-    const spreadRelative = RoundTo4Decimals(spread / ((bestBid + bestAsk) / 2));
+      const bestAsk = Math.min(
+        ...bookStateRef.current.asks.map((order) => order[0])
+      );
 
-    setSpread(spread);
-    setSpreadPercentage(spreadRelative * 100);
+      const spread = bestAsk - bestBid;
+      const spreadRelative = RoundTo4Decimals(
+        spread / ((bestBid + bestAsk) / 2)
+      );
+
+      setSpread(spread);
+      setSpreadPercentage(spreadRelative * 100);
+    } else {
+      setSpread(0);
+      setSpreadPercentage(0);
+    }
   };
 
   const throwFeedError = useCallback(() => {
     const ws = webSocketConnectionRef.current;
     if (!error) {
       ws && ws.close();
+      bookStateRef.current = { bids: [], asks: [] };
       setError("Simulated WebSocket error");
     } else {
       triggerRecconection();
@@ -79,7 +88,7 @@ export const OrderBook = () => {
 
       timerId = setInterval(() => arrageBookViewState(), 3000);
       // remove later
-      setTimeout(() => clearInterval(timerId), 5000);
+      // setTimeout(() => clearInterval(timerId), 5000);
       console.log("subscribing to", productId);
       ws.send(
         JSON.stringify({
@@ -116,6 +125,7 @@ export const OrderBook = () => {
       console.log("closing WS");
       clearInterval(timerId);
       bookStateRef.current = { bids: [], asks: [] };
+      arrageBookViewState();
     };
 
     return () => {

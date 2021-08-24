@@ -2,11 +2,14 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import { OrderBook } from "./OrderBook";
+import ErrorBoundary from "./ErrorBoundary";
 import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
   <React.StrictMode>
-    <OrderBook />
+    <ErrorBoundary>
+      <OrderBook />
+    </ErrorBoundary>
   </React.StrictMode>,
   document.getElementById("root")
 );

@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { Colors } from "./Colors";
-import { SpreadInfo } from "./SpreadInfo";
+import { Colors } from "./config";
+import { Spread } from "./Spread";
 import { darken } from "polished";
+import { useState } from "react";
 
 interface Props {
   onGroupingChange: (selectedGrouping: number) => void;
@@ -14,7 +15,6 @@ interface Props {
 
 export const Header = ({
   onGroupingChange,
-  selectedGrouping,
   groupingOptions,
   spread,
   spreadPercentage,
@@ -24,33 +24,34 @@ export const Header = ({
       css={css`
         display: flex;
         align-items: center;
-        border-bottom: 1px solid ${Colors.LIGHT_GRAY};
+        border-bottom: 1px solid ${Colors.GRAY};
+        padding: 5px 8px;
         > * {
           display: flex;
           flex: 1;
         }
       `}
     >
+      <div>Order Book</div>
       <div
         css={css`
-          justify-self: flex-start;
+          justify-content: center;
+          @media only screen and (max-width: 688px) {
+            display: none;
+          }
         `}
       >
-        Order Book
+        <Spread spread={spread} spreadPercentage={spreadPercentage} />
       </div>
       <div
         css={css`
-          justify-self: center;
+          justify-content: flex-end;
         `}
       >
-        <SpreadInfo spread={spread} spreadPercentage={spreadPercentage} />
-      </div>
-      <div
-        css={css`
-          justify-self: flex-end;
-        `}
-      >
-        <GroupingSelect options={groupingOptions} />
+        <GroupingSelect
+          options={groupingOptions}
+          onGroupingChange={onGroupingChange}
+        />
       </div>
     </div>
   );
@@ -58,9 +59,19 @@ export const Header = ({
 
 interface GroupingSelectProps {
   options: number[];
+  onGroupingChange: (selectedGrouping: number) => void;
 }
 
-const GroupingSelect = ({ options }: GroupingSelectProps) => {
+const GroupingSelect = ({ options, onGroupingChange }: GroupingSelectProps) => {
+  const [selected, setSelected] = useState(options[0]);
+  const handleGroupingChange: React.ChangeEventHandler<HTMLSelectElement> = (
+    event
+  ) => {
+    const selectedValue = Number(event.currentTarget.value);
+    setSelected(selectedValue);
+    onGroupingChange(selectedValue);
+  };
+
   return (
     <select
       css={css`
@@ -76,6 +87,8 @@ const GroupingSelect = ({ options }: GroupingSelectProps) => {
           background-color: ${darken(0.08, Colors.GRAY)};
         }
       `}
+      value={selected}
+      onChange={handleGroupingChange}
     >
       {options.map((option) => (
         <option value={option}>{`Group ${option.toFixed(2)}`} </option>

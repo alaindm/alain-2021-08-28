@@ -2,8 +2,8 @@
 import { css } from "@emotion/react";
 import { Snapshot, OrderType } from "../types";
 import { Spread } from "../Spread";
-import { LevelList, TotalBarSide } from "./LevelList";
 import { getLevelsFromOrders } from "../helpers/get-levels-from-orders";
+import { LevelTable, TotalBarSide } from "./table";
 
 interface Props {
   bookState: Snapshot;
@@ -65,7 +65,7 @@ export const BookComponent = ({
           flex: 1;
         `}
       >
-        <LevelList
+        <LevelTable
           orderType={OrderType.BID}
           totalBarSide={TotalBarSide.LEFT}
           levels={bidsGroupedByPriceLevel}
@@ -91,7 +91,7 @@ export const BookComponent = ({
           flex: 1;
         `}
       >
-        <LevelList
+        <LevelTable
           orderType={OrderType.ASK}
           totalBarSide={TotalBarSide.RIGHT}
           levels={asksGroupedByPriceLevel}

@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import { OrderBook } from "./OrderBook";
+import { OrderBook } from "./orderbook";
 import ErrorBoundary from "./ErrorBoundary";
 import reportWebVitals from "./reportWebVitals";
 

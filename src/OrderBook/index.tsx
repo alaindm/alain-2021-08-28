@@ -1,13 +1,13 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BookComponent } from "./Book";
-import { Colors, ETH_GROUPING_OPTIONS, XBT_GROUPING_OPTIONS } from "./config";
+import { BookComponent } from "./book";
+import { XBT_GROUPING_OPTIONS, ETH_GROUPING_OPTIONS, Colors } from "./config";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { getUpdatedSnapshotFromDeltas } from "./helpers/get-updated-snapshot-from-deltas";
 import { RoundTo4Decimals } from "./helpers/utils";
-import { Snapshot, ProductTypes, FeedMessage } from "./types";
+import { ProductTypes, Snapshot, FeedMessage } from "./types";
 
 export const OrderBook = () => {
   const [connectionTrigger, setConnectionTrigger] = useState(true);
@@ -86,7 +86,7 @@ export const OrderBook = () => {
     ws.onopen = () => {
       setError(null);
 
-      timerId = setInterval(() => arrageBookViewState(), 3000);
+      timerId = setInterval(() => arrageBookViewState(), 1000);
       // remove later
       // setTimeout(() => clearInterval(timerId), 5000);
       console.log("subscribing to", productId);

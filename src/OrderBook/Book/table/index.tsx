@@ -21,7 +21,7 @@ interface Props {
   levels: Level[];
 }
 
-export const LevelTable = ({
+export const Table = ({
   orderType,
   totalBarSide,
   levels,
@@ -35,33 +35,32 @@ export const LevelTable = ({
     </TableHeader>
     <TableBody orderType={orderType}>
       {levels.map((level) => (
-        <>
-          <Row
-            orderType={orderType}
-            levelTotal={level.total}
-            highestTotal={highestTotal}
-            totalBarSide={totalBarSide}
-          >
-            <TotalColumn totalBarSide={totalBarSide}>
-              {level.total.toLocaleString()}
-            </TotalColumn>
-            <SizeColumn>{level.size.toLocaleString()}</SizeColumn>
-            <PriceColumn totalBarSide={totalBarSide}>
-              <div
-                css={css`
-                  color: ${orderType === OrderType.BID
-                    ? Colors.LIGHT_GREEN
-                    : Colors.LIGHT_RED};
-                `}
-              >
-                {level.price.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </div>
-            </PriceColumn>
-          </Row>
-        </>
+        <Row
+          key={level.price}
+          orderType={orderType}
+          levelTotal={level.total}
+          highestTotal={highestTotal}
+          totalBarSide={totalBarSide}
+        >
+          <TotalColumn totalBarSide={totalBarSide}>
+            {level.total.toLocaleString()}
+          </TotalColumn>
+          <SizeColumn>{level.size.toLocaleString()}</SizeColumn>
+          <PriceColumn totalBarSide={totalBarSide}>
+            <div
+              css={css`
+                color: ${orderType === OrderType.BID
+                  ? Colors.LIGHT_GREEN
+                  : Colors.LIGHT_RED};
+              `}
+            >
+              {level.price.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </div>
+          </PriceColumn>
+        </Row>
       ))}
     </TableBody>
   </>

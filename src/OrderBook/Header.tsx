@@ -91,7 +91,9 @@ const GroupingSelect = ({ options, onGroupingChange }: GroupingSelectProps) => {
       onChange={handleGroupingChange}
     >
       {options.map((option) => (
-        <option value={option}>{`Group ${option.toFixed(2)}`} </option>
+        <option key={option} value={option}>
+          {`Group ${option.toFixed(2)}`}{" "}
+        </option>
       ))}
     </select>
   );

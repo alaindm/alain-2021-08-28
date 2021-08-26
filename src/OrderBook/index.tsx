@@ -19,6 +19,7 @@ import {
 } from "./config";
 import { AppSnapshot, FeedMessage } from "./types";
 import { initialState, reducer } from "./state/reducer";
+import { useIsMobile } from "./isMobile";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 
@@ -30,6 +31,12 @@ export const OrderBook = () => {
   const webSocketConnectionRef = useRef<WebSocket>();
   const headerElementRef = useRef<HTMLDivElement>(null);
   const footerElementRef = useRef<HTMLDivElement>(null);
+
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    dispatch({ type: "SET_IS_MOBILE", payload: isMobile });
+  }, [isMobile]);
 
   useLayoutEffect(() => {
     const bookAreaHeight =

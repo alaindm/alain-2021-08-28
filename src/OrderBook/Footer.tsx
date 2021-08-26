@@ -15,8 +15,9 @@ export const Footer = ({ hasError, onToggleFeed, onKillFeed }: Props) => (
       display: flex;
       align-items: center;
       justify-content: center;
+      height: 3.5rem;
       > * {
-        margin: 1rem 0.5rem;
+        margin: 0 0.5rem;
       }
     `}
   >

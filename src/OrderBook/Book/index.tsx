@@ -60,9 +60,7 @@ export const BookComponent = ({
         css={css`
           display: flex;
           justify-content: center;
-          > * {
-            padding: 0.6rem;
-          }
+          height: 1.7rem;
           display: ${!isMobile && "none"};
         `}
       >

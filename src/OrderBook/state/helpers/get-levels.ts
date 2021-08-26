@@ -12,7 +12,8 @@ export const getLevels = (
   orders: Map<number, number>,
   grouping: number,
   orderType: OrderType,
-  maxRows: number
+  maxRows: number,
+  isMobile: boolean
 ) => {
   const groupedOrdersMap = new Map<number, number>();
 
@@ -22,13 +23,15 @@ export const getLevels = (
     groupedOrdersMap.set(priceLevel, currentPriceLevelSize + size);
   });
 
+  const maxRowsPerLevel = isMobile ? Math.ceil(maxRows / 2) - 1 : maxRows;
+
   const sortedLevelList = Array.from(groupedOrdersMap.keys()).sort(
     getCompareFunction(
       orderType === OrderType.BID ? SortOrder.DESCENDING : SortOrder.ASCENDING
     )
   );
 
-  const sortedLevelListCapped = sortedLevelList.slice(0, maxRows);
+  const sortedLevelListCapped = sortedLevelList.slice(0, maxRowsPerLevel);
 
   const levelInfoList: Level[] = [];
 

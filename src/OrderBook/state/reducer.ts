@@ -10,6 +10,7 @@ type State = {
   maxRowsToRender: number;
   error: string | null;
   grouping: number;
+  isMobile: boolean;
 };
 
 export const initialState: State = {
@@ -25,6 +26,7 @@ export const initialState: State = {
   maxRowsToRender: 0,
   error: null,
   grouping: 0.5,
+  isMobile: true,
 };
 
 type Action =
@@ -33,7 +35,8 @@ type Action =
   | { type: "CHANGE_GROUPING"; payload: number }
   | { type: "SET_ERROR"; error: string | null }
   | { type: "UPDATE_BOOK"; snapshot: AppSnapshot }
-  | { type: "SET_MAX_ROWS"; payload: number };
+  | { type: "SET_MAX_ROWS"; payload: number }
+  | { type: "SET_IS_MOBILE"; payload: boolean };
 
 export const reducer = (state: State, action: Action) => {
   switch (action.type) {
@@ -64,14 +67,16 @@ export const reducer = (state: State, action: Action) => {
         action.snapshot.bids,
         state.grouping,
         OrderType.BID,
-        state.maxRowsToRender
+        state.maxRowsToRender,
+        state.isMobile
       );
 
       const asks = getLevels(
         action.snapshot.asks,
         state.grouping,
         OrderType.ASK,
-        state.maxRowsToRender
+        state.maxRowsToRender,
+        state.isMobile
       );
 
       return {
@@ -88,6 +93,11 @@ export const reducer = (state: State, action: Action) => {
       return {
         ...state,
         maxRowsToRender: action.payload,
+      };
+    case "SET_IS_MOBILE":
+      return {
+        ...state,
+        isMobile: action.payload,
       };
     default:
       return state;

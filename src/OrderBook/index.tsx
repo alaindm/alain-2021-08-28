@@ -14,6 +14,8 @@ import {
   ETH_GROUPING_OPTIONS,
   Colors,
   ROW_HEIGHT_REM,
+  WS_FEED,
+  VIEW_UPDATE_INTERVAL,
 } from "./config";
 import { AppSnapshot, FeedMessage } from "./types";
 import { initialState, reducer } from "./state/reducer";
@@ -64,6 +66,8 @@ export const OrderBook = () => {
     const ws = webSocketConnectionRef.current;
     if (!error) {
       ws && ws.close();
+      // This is the same that the 'onerror' method would do to handle the websocket error event
+      clearSnapshot();
       dispatch({ type: "SET_ERROR", error: "Simulated WebSocket error" });
     } else {
       dispatch({ type: "RECONNECT" });
@@ -71,7 +75,7 @@ export const OrderBook = () => {
   }, [error]);
 
   useEffect(() => {
-    const ws = new WebSocket("wss://www.cryptofacilities.com/ws/v1");
+    const ws = new WebSocket(WS_FEED);
     webSocketConnectionRef.current = ws;
 
     let timerId: NodeJS.Timeout;
@@ -81,7 +85,7 @@ export const OrderBook = () => {
 
       timerId = setInterval(
         () => dispatch({ type: "UPDATE_BOOK", snapshot: snapshot.current }),
-        1000
+        VIEW_UPDATE_INTERVAL
       );
 
       ws.send(

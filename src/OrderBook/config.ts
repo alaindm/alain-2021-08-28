@@ -1,3 +1,10 @@
+export const WS_FEED = "wss://www.cryptofacilities.com/ws/v1";
+
+export const VIEW_UPDATE_INTERVAL = 1000; // ms
+
+export const XBT_GROUPING_OPTIONS = [0.5, 1, 2.5];
+export const ETH_GROUPING_OPTIONS = [0.05, 0.1, 0.25];
+
 export const Colors = {
   BLACK: "#121723",
   WHITE: "#f7f7f7",
@@ -11,8 +18,5 @@ export const Colors = {
   RED: "#B91D1D",
   LIGHT_RED: "#C33537",
 };
-
-export const XBT_GROUPING_OPTIONS = [0.5, 1, 2.5];
-export const ETH_GROUPING_OPTIONS = [0.05, 0.1, 0.25];
 
 export const ROW_HEIGHT_REM = 1.7;

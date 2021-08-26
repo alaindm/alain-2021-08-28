@@ -28,7 +28,7 @@ export const BookComponent = ({
     <div
       className="monospace"
       css={css`
-        font-size: 14px;
+        font-size: 0.875rem;
         display: flex;
         width: 100%;
         @media only screen and (max-width: 688px) {
@@ -53,7 +53,7 @@ export const BookComponent = ({
           display: flex;
           justify-content: center;
           > * {
-            padding: 10px;
+            padding: 0.6rem;
           }
           @media only screen and (min-width: 688px) {
             display: none;

@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { Colors } from "../../config";
+import { Colors, ROW_HEIGHT_REM } from "../../config";
 import { OrderType } from "../../types";
 
 interface Props {
@@ -21,7 +21,7 @@ export const TotalLevelBar = ({ orderType, total, highestTotal }: Props) => (
   >
     <div
       css={css`
-        height: 1.7rem;
+        height: ${ROW_HEIGHT_REM}rem;
         width: ${(total / highestTotal) * 100}%;
         background-color: ${orderType === OrderType.BID
           ? Colors.DARK_GREEN

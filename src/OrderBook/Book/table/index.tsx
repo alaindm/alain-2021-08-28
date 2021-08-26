@@ -26,42 +26,44 @@ export const Table = ({
   totalBarSide,
   levels,
   highestTotal,
-}: Props) => (
-  <>
-    <TableHeader orderType={orderType} totalBarSide={totalBarSide}>
-      <TotalColumn totalBarSide={totalBarSide}>TOTAL</TotalColumn>
-      <SizeColumn>SIZE</SizeColumn>
-      <PriceColumn totalBarSide={totalBarSide}>PRICE</PriceColumn>
-    </TableHeader>
-    <TableBody orderType={orderType}>
-      {levels.map((level) => (
-        <Row
-          key={level.price}
-          orderType={orderType}
-          levelTotal={level.total}
-          highestTotal={highestTotal}
-          totalBarSide={totalBarSide}
-        >
-          <TotalColumn totalBarSide={totalBarSide}>
-            {level.total.toLocaleString()}
-          </TotalColumn>
-          <SizeColumn>{level.size.toLocaleString()}</SizeColumn>
-          <PriceColumn totalBarSide={totalBarSide}>
-            <div
-              css={css`
-                color: ${orderType === OrderType.BID
-                  ? Colors.LIGHT_GREEN
-                  : Colors.LIGHT_RED};
-              `}
-            >
-              {level.price.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </div>
-          </PriceColumn>
-        </Row>
-      ))}
-    </TableBody>
-  </>
-);
+}: Props) => {
+  return (
+    <>
+      <TableHeader orderType={orderType} totalBarSide={totalBarSide}>
+        <TotalColumn totalBarSide={totalBarSide}>TOTAL</TotalColumn>
+        <SizeColumn>SIZE</SizeColumn>
+        <PriceColumn totalBarSide={totalBarSide}>PRICE</PriceColumn>
+      </TableHeader>
+      <TableBody orderType={orderType}>
+        {levels.map((level) => (
+          <Row
+            key={level.price}
+            orderType={orderType}
+            levelTotal={level.total}
+            highestTotal={highestTotal}
+            totalBarSide={totalBarSide}
+          >
+            <TotalColumn totalBarSide={totalBarSide}>
+              {level.total.toLocaleString()}
+            </TotalColumn>
+            <SizeColumn>{level.size.toLocaleString()}</SizeColumn>
+            <PriceColumn totalBarSide={totalBarSide}>
+              <div
+                css={css`
+                  color: ${orderType === OrderType.BID
+                    ? Colors.LIGHT_GREEN
+                    : Colors.LIGHT_RED};
+                `}
+              >
+                {level.price.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </div>
+            </PriceColumn>
+          </Row>
+        ))}
+      </TableBody>
+    </>
+  );
+};

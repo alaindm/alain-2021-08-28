@@ -18,14 +18,14 @@ export type FeedSnapshot = {
   asks: Order[];
 };
 
-export type AppSnapshot = {
-  bids: Map<number, number>;
-  asks: Map<number, number>;
-};
-
 export type FeedMessage = FeedSnapshot & {
   feed: string;
   product_id: string;
+};
+
+export type AppSnapshot = {
+  bids: Map<number, number>;
+  asks: Map<number, number>;
 };
 
 export type BookInfo = {

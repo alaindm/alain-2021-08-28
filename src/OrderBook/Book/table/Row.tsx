@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import { TotalBarSide } from ".";
+import { ROW_HEIGHT_REM } from "../../config";
 import { OrderType } from "../../types";
 import { TotalLevelBar } from "./TotalLevelBar";
 
@@ -21,7 +22,7 @@ export const Row = ({
 }: Props) => (
   <div
     css={css`
-      height: 1.7rem;
+      height: ${ROW_HEIGHT_REM}rem;
       width: 100%;
       position: relative;
     `}
@@ -35,7 +36,7 @@ export const Row = ({
         flex-direction: ${totalBarSide === TotalBarSide.LEFT
           ? "row"
           : "row-reverse"};
-        height: 1.7rem;
+        height: ${ROW_HEIGHT_REM}rem;
         align-items: center;
         > * {
           width: 33.333%;

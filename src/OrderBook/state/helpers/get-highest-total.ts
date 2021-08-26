@@ -1,4 +1,4 @@
-import { Level } from "../types";
+import { Level } from "../../types";
 
 export const getHighestTotal = (bids: Level[], asks: Level[]) => {
   const bidTotals = Object.values(bids).map((level) => level.total);

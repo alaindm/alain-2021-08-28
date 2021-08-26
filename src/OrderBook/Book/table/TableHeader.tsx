@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import { TotalBarSide } from ".";
-import { Colors } from "../../config";
+import { Colors, ROW_HEIGHT_REM } from "../../config";
 import { OrderType } from "../../types";
 
 interface ListHeaderProps {
@@ -17,7 +17,7 @@ export const TableHeader = ({
 }: ListHeaderProps) => (
   <div
     css={css`
-      height: 1.7rem;
+      height: ${ROW_HEIGHT_REM}rem;
       width: 100%;
       color: ${Colors.LIGHT_GRAY};
       border-bottom: 1px solid ${Colors.DARK_GRAY};

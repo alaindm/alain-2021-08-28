@@ -19,7 +19,14 @@ export const BookComponent = ({
 }: Props) => {
   if (error) {
     return (
-      <div>
+      <div
+        css={css`
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+        `}
+      >
         <div>Lost connection</div>
       </div>
     );

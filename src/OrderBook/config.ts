@@ -14,3 +14,5 @@ export const Colors = {
 
 export const XBT_GROUPING_OPTIONS = [0.5, 1, 2.5];
 export const ETH_GROUPING_OPTIONS = [0.05, 0.1, 0.25];
+
+export const ROW_HEIGHT_REM = 1.7;

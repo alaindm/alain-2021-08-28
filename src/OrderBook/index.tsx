@@ -1,102 +1,48 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+} from "react";
 import { BookComponent } from "./book";
-import { XBT_GROUPING_OPTIONS, ETH_GROUPING_OPTIONS, Colors } from "./config";
-import { Footer } from "./Footer";
+import {
+  XBT_GROUPING_OPTIONS,
+  ETH_GROUPING_OPTIONS,
+  Colors,
+  ROW_HEIGHT_REM,
+} from "./config";
+import { AppSnapshot, FeedMessage } from "./types";
+import { initialState, reducer } from "./state/reducer";
 import { Header } from "./Header";
-import { AppSnapshot, BookInfo, FeedMessage, OrderType } from "./types";
-import { getSpreads } from "./helpers/get-spreads";
-import { getLevels } from "./helpers/get-levels";
-import { getHighestTotal } from "./helpers/get-highest-total";
-
-type State = {
-  productId: string;
-  connectionTrigger: boolean;
-  book: BookInfo;
-  error: string | null;
-  grouping: number;
-};
-
-type Action =
-  | { type: "RECONNECT" }
-  | { type: "TOGGLE_FEED" }
-  | { type: "CHANGE_GROUPING"; payload: number }
-  | { type: "SET_ERROR"; error: string | null }
-  | { type: "UPDATE_BOOK"; snapshot: AppSnapshot };
-
-const reducer = (state: State, action: Action) => {
-  switch (action.type) {
-    case "RECONNECT":
-      return {
-        ...state,
-        connectionTrigger: !state.connectionTrigger,
-      };
-    case "TOGGLE_FEED":
-      return {
-        ...state,
-        productId: state.productId === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD",
-      };
-    case "CHANGE_GROUPING":
-      return {
-        ...state,
-        grouping: action.payload,
-      };
-    case "SET_ERROR":
-      return {
-        ...state,
-        error: action.error,
-      };
-    case "UPDATE_BOOK":
-      const { spread, spreadPercentage } = getSpreads(action.snapshot);
-
-      const bids = getLevels(
-        action.snapshot.bids,
-        state.grouping,
-        OrderType.BID
-      );
-
-      const asks = getLevels(
-        action.snapshot.asks,
-        state.grouping,
-        OrderType.ASK
-      );
-
-      return {
-        ...state,
-        book: {
-          bids,
-          asks,
-          spread,
-          spreadPercentage,
-          highestTotal: getHighestTotal(bids, asks),
-        },
-      };
-    default:
-      return state;
-  }
-};
-
-const initialState: State = {
-  productId: "PI_XBTUSD",
-  connectionTrigger: false,
-  book: {
-    bids: [],
-    asks: [],
-    spread: 0,
-    spreadPercentage: 0,
-    highestTotal: 0,
-  },
-  error: null,
-  grouping: 0.5,
-};
+import { Footer } from "./Footer";
 
 export const OrderBook = () => {
   const [{ productId, connectionTrigger, book, error, grouping }, dispatch] =
     useReducer(reducer, initialState);
 
-  const webSocketConnectionRef = useRef<WebSocket>();
   const snapshot = useRef<AppSnapshot>({ bids: new Map(), asks: new Map() });
+  const webSocketConnectionRef = useRef<WebSocket>();
+  const headerElementRef = useRef<HTMLDivElement>(null);
+  const footerElementRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const bookAreaHeight =
+      window.innerHeight -
+      (headerElementRef.current?.clientHeight || 0) -
+      (footerElementRef.current?.offsetHeight || 0);
+
+    // root font-size is 16px
+    const rowHeight = 16 * ROW_HEIGHT_REM;
+
+    dispatch({
+      type: "SET_MAX_ROWS",
+      payload: Math.floor(bookAreaHeight / rowHeight) - 1, // substract one for the TableHeader row
+    });
+  }, []);
 
   const clearSnapshot = () => {
     snapshot.current = {
@@ -118,7 +64,6 @@ export const OrderBook = () => {
     const ws = webSocketConnectionRef.current;
     if (!error) {
       ws && ws.close();
-      clearSnapshot();
       dispatch({ type: "SET_ERROR", error: "Simulated WebSocket error" });
     } else {
       dispatch({ type: "RECONNECT" });
@@ -139,7 +84,6 @@ export const OrderBook = () => {
         1000
       );
 
-      console.log("subscribing to", productId);
       ws.send(
         JSON.stringify({
           event: "subscribe",
@@ -179,11 +123,11 @@ export const OrderBook = () => {
     };
 
     ws.onerror = () => {
+      clearSnapshot();
       dispatch({ type: "SET_ERROR", error: "WebSocket error" });
     };
 
     ws.onclose = () => {
-      console.log("closing WS");
       clearInterval(timerId);
       clearSnapshot();
       dispatch({ type: "UPDATE_BOOK", snapshot: snapshot.current });
@@ -192,6 +136,7 @@ export const OrderBook = () => {
     return () => {
       if (ws.readyState === ws.OPEN) ws.close();
     };
+    // productId is omitted from the dependencies to prevent closing and re-opening a connection when changin the productId
   }, [connectionTrigger]);
 
   useEffect(() => {
@@ -207,10 +152,7 @@ export const OrderBook = () => {
         })
       );
 
-    console.log("subscribing to", productId);
-
     return () => {
-      console.log("UNsubscribing to", productId);
       ws &&
         ws.send(
           JSON.stringify({
@@ -220,7 +162,8 @@ export const OrderBook = () => {
           })
         );
     };
-  }, [productId]);
+    // connectionTrigger dependency is necessary here to get the current ws reference
+  }, [productId, connectionTrigger]);
 
   const currentGroupingOptions = useMemo(
     () =>
@@ -231,6 +174,14 @@ export const OrderBook = () => {
   return (
     <div
       css={css`
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+          "header"
+          "book"
+          "footer";
+        height: 100vh;
         background-color: ${Colors.BLACK};
         color: ${Colors.WHITE};
         .monospace {
@@ -238,24 +189,45 @@ export const OrderBook = () => {
         }
       `}
     >
-      <Header
-        onGroupingChange={handleGroupingChange}
-        selectedGrouping={grouping}
-        groupingOptions={currentGroupingOptions}
-        spread={book.spread}
-        spreadPercentage={book.spreadPercentage}
-      />
-      <BookComponent
-        bookState={book}
-        error={error}
-        spread={book.spread}
-        spreadPercentage={book.spreadPercentage}
-      />
-      <Footer
-        hasError={!!error}
-        onToggleFeed={toggleProduct}
-        onKillFeed={throwFeedError}
-      />
+      <div
+        ref={headerElementRef}
+        css={css`
+          grid-area: header;
+        `}
+      >
+        <Header
+          onGroupingChange={handleGroupingChange}
+          selectedGrouping={grouping}
+          groupingOptions={currentGroupingOptions}
+          spread={book.spread}
+          spreadPercentage={book.spreadPercentage}
+        />
+      </div>
+      <div
+        css={css`
+          grid-area: book;
+          overflow: auto;
+        `}
+      >
+        <BookComponent
+          bookState={book}
+          error={error}
+          spread={book.spread}
+          spreadPercentage={book.spreadPercentage}
+        />
+      </div>
+      <div
+        ref={footerElementRef}
+        css={css`
+          grid-area: footer;
+        `}
+      >
+        <Footer
+          hasError={!!error}
+          onToggleFeed={toggleProduct}
+          onKillFeed={throwFeedError}
+        />
+      </div>
     </div>
   );
 };

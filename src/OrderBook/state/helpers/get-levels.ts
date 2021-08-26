@@ -1,4 +1,4 @@
-import { Level, OrderType } from "../types";
+import { Level, OrderType } from "../../types";
 
 enum SortOrder {
   ASCENDING = 1,
@@ -11,7 +11,8 @@ const getCompareFunction = (sortOrder: SortOrder) => (a: number, b: number) =>
 export const getLevels = (
   orders: Map<number, number>,
   grouping: number,
-  orderType: OrderType
+  orderType: OrderType,
+  maxRows: number
 ) => {
   const groupedOrdersMap = new Map<number, number>();
 
@@ -27,9 +28,11 @@ export const getLevels = (
     )
   );
 
+  const sortedLevelListCapped = sortedLevelList.slice(0, maxRows);
+
   const levelInfoList: Level[] = [];
 
-  sortedLevelList.forEach((level, index) => {
+  sortedLevelListCapped.forEach((level, index) => {
     const groupSize = groupedOrdersMap.get(level) as number;
     const previousTotal = levelInfoList[index - 1]?.total || 0;
 

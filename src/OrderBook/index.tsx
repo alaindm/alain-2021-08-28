@@ -1,81 +1,129 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { BookComponent } from "./book";
 import { XBT_GROUPING_OPTIONS, ETH_GROUPING_OPTIONS, Colors } from "./config";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
-import { getUpdatedSnapshotFromDeltas } from "./helpers/get-updated-snapshot-from-deltas";
-import { RoundTo4Decimals } from "./helpers/utils";
-import { ProductTypes, Snapshot, FeedMessage } from "./types";
+import { AppSnapshot, BookInfo, FeedMessage, OrderType } from "./types";
+import { getSpreads } from "./helpers/get-spreads";
+import { getLevels } from "./helpers/get-levels";
+import { getHighestTotal } from "./helpers/get-highest-total";
 
-export const OrderBook = () => {
-  const [connectionTrigger, setConnectionTrigger] = useState(true);
-  const triggerRecconection = useCallback(
-    () => setConnectionTrigger((state) => !state),
-    []
-  );
+type State = {
+  productId: string;
+  connectionTrigger: boolean;
+  book: BookInfo;
+  error: string | null;
+  grouping: number;
+};
 
-  const [productId, setProductId] = useState<ProductTypes>("PI_XBTUSD");
-  const webSocketConnectionRef = useRef<WebSocket>();
-  const bookStateRef = useRef<Snapshot>({ bids: [], asks: [] });
-  const [bookViewState, setBookViewState] = useState<Snapshot>({
+type Action =
+  | { type: "RECONNECT" }
+  | { type: "TOGGLE_FEED" }
+  | { type: "CHANGE_GROUPING"; payload: number }
+  | { type: "SET_ERROR"; error: string | null }
+  | { type: "UPDATE_BOOK"; snapshot: AppSnapshot };
+
+const reducer = (state: State, action: Action) => {
+  switch (action.type) {
+    case "RECONNECT":
+      return {
+        ...state,
+        connectionTrigger: !state.connectionTrigger,
+      };
+    case "TOGGLE_FEED":
+      return {
+        ...state,
+        productId: state.productId === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD",
+      };
+    case "CHANGE_GROUPING":
+      return {
+        ...state,
+        grouping: action.payload,
+      };
+    case "SET_ERROR":
+      return {
+        ...state,
+        error: action.error,
+      };
+    case "UPDATE_BOOK":
+      const { spread, spreadPercentage } = getSpreads(action.snapshot);
+
+      const bids = getLevels(
+        action.snapshot.bids,
+        state.grouping,
+        OrderType.BID
+      );
+
+      const asks = getLevels(
+        action.snapshot.asks,
+        state.grouping,
+        OrderType.ASK
+      );
+
+      return {
+        ...state,
+        book: {
+          bids,
+          asks,
+          spread,
+          spreadPercentage,
+          highestTotal: getHighestTotal(bids, asks),
+        },
+      };
+    default:
+      return state;
+  }
+};
+
+const initialState: State = {
+  productId: "PI_XBTUSD",
+  connectionTrigger: false,
+  book: {
     bids: [],
     asks: [],
-  });
-  const [priceLevelGrouping, setPriceLevelGrouping] = useState(0.5);
-  const [spread, setSpread] = useState<number>(0);
-  const [spreadPercentage, setSpreadPercentage] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
+    spread: 0,
+    spreadPercentage: 0,
+    highestTotal: 0,
+  },
+  error: null,
+  grouping: 0.5,
+};
+
+export const OrderBook = () => {
+  const [{ productId, connectionTrigger, book, error, grouping }, dispatch] =
+    useReducer(reducer, initialState);
+
+  const webSocketConnectionRef = useRef<WebSocket>();
+  const snapshot = useRef<AppSnapshot>({ bids: new Map(), asks: new Map() });
+
+  const clearSnapshot = () => {
+    snapshot.current = {
+      bids: new Map(),
+      asks: new Map(),
+    };
+  };
 
   const toggleProduct = useCallback(
-    () =>
-      setProductId((currentProductId) =>
-        currentProductId === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD"
-      ),
+    () => dispatch({ type: "TOGGLE_FEED" }),
     []
   );
 
   const handleGroupingChange = useCallback((selectedGrouping: number) => {
-    setPriceLevelGrouping(selectedGrouping);
+    dispatch({ type: "CHANGE_GROUPING", payload: selectedGrouping });
   }, []);
-
-  const arrageBookViewState = () => {
-    setBookViewState(bookStateRef.current);
-
-    // TODO : Put spread calcs in a helper func
-    if (bookStateRef.current.bids.length && bookStateRef.current.asks.length) {
-      const bestBid = Math.max(
-        ...bookStateRef.current.bids.map((order) => order[0])
-      );
-
-      const bestAsk = Math.min(
-        ...bookStateRef.current.asks.map((order) => order[0])
-      );
-
-      const spread = bestAsk - bestBid;
-      const spreadRelative = RoundTo4Decimals(
-        spread / ((bestBid + bestAsk) / 2)
-      );
-
-      setSpread(spread);
-      setSpreadPercentage(spreadRelative * 100);
-    } else {
-      setSpread(0);
-      setSpreadPercentage(0);
-    }
-  };
 
   const throwFeedError = useCallback(() => {
     const ws = webSocketConnectionRef.current;
     if (!error) {
       ws && ws.close();
-      bookStateRef.current = { bids: [], asks: [] };
-      setError("Simulated WebSocket error");
+      clearSnapshot();
+      dispatch({ type: "SET_ERROR", error: "Simulated WebSocket error" });
     } else {
-      triggerRecconection();
+      dispatch({ type: "RECONNECT" });
     }
-  }, [triggerRecconection, error]);
+  }, [error]);
 
   useEffect(() => {
     const ws = new WebSocket("wss://www.cryptofacilities.com/ws/v1");
@@ -84,11 +132,13 @@ export const OrderBook = () => {
     let timerId: NodeJS.Timeout;
 
     ws.onopen = () => {
-      setError(null);
+      dispatch({ type: "SET_ERROR", error: null });
 
-      timerId = setInterval(() => arrageBookViewState(), 1000);
-      // remove later
-      // setTimeout(() => clearInterval(timerId), 5000);
+      timerId = setInterval(
+        () => dispatch({ type: "UPDATE_BOOK", snapshot: snapshot.current }),
+        1000
+      );
+
       console.log("subscribing to", productId);
       ws.send(
         JSON.stringify({
@@ -103,29 +153,40 @@ export const OrderBook = () => {
       const message = JSON.parse(event.data);
       if (message.feed === "book_ui_1_snapshot") {
         const { bids, asks } = message as FeedMessage;
-        bookStateRef.current = { bids, asks };
-        arrageBookViewState();
+
+        clearSnapshot();
+        bids.forEach(([price, size]) => snapshot.current.bids.set(price, size));
+        asks.forEach(([price, size]) => snapshot.current.asks.set(price, size));
+
+        dispatch({ type: "UPDATE_BOOK", snapshot: snapshot.current });
       }
 
       if (message.feed === "book_ui_1" && message.bids && message.asks) {
         const { bids, asks } = message as FeedMessage;
-        bookStateRef.current = getUpdatedSnapshotFromDeltas({
-          snapshot: bookStateRef.current,
-          deltaBids: bids,
-          deltaAsks: asks,
-        });
+
+        bids.forEach(([price, size]) =>
+          size === 0
+            ? snapshot.current.bids.delete(price)
+            : snapshot.current.bids.set(price, size)
+        );
+
+        asks.forEach(([price, size]) =>
+          size === 0
+            ? snapshot.current.asks.delete(price)
+            : snapshot.current.asks.set(price, size)
+        );
       }
     };
 
     ws.onerror = () => {
-      setError("WebSocket error");
+      dispatch({ type: "SET_ERROR", error: "WebSocket error" });
     };
 
     ws.onclose = () => {
       console.log("closing WS");
       clearInterval(timerId);
-      bookStateRef.current = { bids: [], asks: [] };
-      arrageBookViewState();
+      clearSnapshot();
+      dispatch({ type: "UPDATE_BOOK", snapshot: snapshot.current });
     };
 
     return () => {
@@ -179,17 +240,16 @@ export const OrderBook = () => {
     >
       <Header
         onGroupingChange={handleGroupingChange}
-        selectedGrouping={priceLevelGrouping}
+        selectedGrouping={grouping}
         groupingOptions={currentGroupingOptions}
-        spread={spread}
-        spreadPercentage={spreadPercentage}
+        spread={book.spread}
+        spreadPercentage={book.spreadPercentage}
       />
       <BookComponent
-        bookState={bookViewState}
-        priceLevelGrouping={priceLevelGrouping}
+        bookState={book}
         error={error}
-        spread={spread}
-        spreadPercentage={spreadPercentage}
+        spread={book.spread}
+        spreadPercentage={book.spreadPercentage}
       />
       <Footer
         hasError={!!error}

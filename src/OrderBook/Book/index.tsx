@@ -1,13 +1,11 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { Snapshot, OrderType } from "../types";
+import { BookInfo, OrderType } from "../types";
 import { Spread } from "../Spread";
-import { getLevelsFromOrders } from "../helpers/get-levels-from-orders";
 import { Table, TotalBarSide } from "./table";
 
 interface Props {
-  bookState: Snapshot;
-  priceLevelGrouping: number;
+  bookState: BookInfo;
   error: string | null;
   spread: number;
   spreadPercentage: number;
@@ -16,35 +14,13 @@ interface Props {
 export const BookComponent = ({
   error,
   bookState,
-  priceLevelGrouping,
   spread,
   spreadPercentage,
 }: Props) => {
-  const bidsGroupedByPriceLevel = getLevelsFromOrders(
-    bookState.bids,
-    priceLevelGrouping,
-    OrderType.BID
-  );
-
-  const asksGroupedByPriceLevel = getLevelsFromOrders(
-    bookState.asks,
-    priceLevelGrouping,
-    OrderType.ASK
-  );
-
-  const highestTotal =
-    bookState.bids.length || bookState.asks.length
-      ? Math.max(
-          ...bidsGroupedByPriceLevel.map((levelInfo) => levelInfo.total),
-          ...asksGroupedByPriceLevel.map((levelInfo) => levelInfo.total)
-        )
-      : 0;
-
   if (error) {
     return (
       <div>
         <div>Lost connection</div>
-        <div>Reconnecting...</div>
       </div>
     );
   }
@@ -68,8 +44,8 @@ export const BookComponent = ({
         <Table
           orderType={OrderType.BID}
           totalBarSide={TotalBarSide.LEFT}
-          levels={bidsGroupedByPriceLevel}
-          highestTotal={highestTotal}
+          levels={bookState.bids}
+          highestTotal={bookState.highestTotal}
         />
       </div>
       <div
@@ -94,8 +70,8 @@ export const BookComponent = ({
         <Table
           orderType={OrderType.ASK}
           totalBarSide={TotalBarSide.RIGHT}
-          levels={asksGroupedByPriceLevel}
-          highestTotal={highestTotal}
+          levels={bookState.asks}
+          highestTotal={bookState.highestTotal}
         />
       </div>
     </div>

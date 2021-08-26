@@ -17,7 +17,7 @@ export const Spread = ({ spread, spreadPercentage }: Props) => {
     >
       <span style={{ marginRight: "10px" }}>Spread:</span>
       <span className="monospace">
-        {spread ? `${spread.toFixed(2)}   (${spreadPercentage})%` : `-`}
+        {spread ? `${spread.toFixed(2)}   (${spreadPercentage * 100})%` : `-`}
       </span>
     </div>
   );

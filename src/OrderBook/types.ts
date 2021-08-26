@@ -13,12 +13,25 @@ export type Level = {
   total: number;
 };
 
-export type Snapshot = {
+export type FeedSnapshot = {
   bids: Order[];
   asks: Order[];
 };
 
-export type FeedMessage = Snapshot & {
+export type AppSnapshot = {
+  bids: Map<number, number>;
+  asks: Map<number, number>;
+};
+
+export type FeedMessage = FeedSnapshot & {
   feed: string;
   product_id: string;
+};
+
+export type BookInfo = {
+  bids: Level[];
+  asks: Level[];
+  spread: number;
+  spreadPercentage: number;
+  highestTotal: number;
 };

@@ -1,21 +1,25 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import { TotalBarSide } from "..";
+import { useIsMobile } from "../../../isMobile";
 
 interface Props {
   totalBarSide: TotalBarSide;
   children: React.ReactNode;
 }
 
-export const PriceColumn = ({ totalBarSide, children }: Props) => (
-  <div
-    css={css`
-      margin-right: ${totalBarSide === TotalBarSide.LEFT ? "4rem" : 0};
-      @media only screen and (max-width: 688px) {
-        margin-right: 0;
-      }
-    `}
-  >
-    {children}
-  </div>
-);
+export const PriceColumn = ({ totalBarSide, children }: Props) => {
+  const isMobile = useIsMobile();
+
+  return (
+    <div
+      css={css`
+        margin-right: ${isMobile || totalBarSide === TotalBarSide.LEFT
+          ? "4rem"
+          : 0};
+      `}
+    >
+      {children}
+    </div>
+  );
+};

@@ -3,6 +3,7 @@ import { css } from "@emotion/react";
 import { BookInfo, OrderType } from "../types";
 import { Spread } from "../Spread";
 import { Table, TotalBarSide } from "./table";
+import { useIsMobile } from "../isMobile";
 
 interface Props {
   bookState: BookInfo;
@@ -17,6 +18,8 @@ export const BookComponent = ({
   spread,
   spreadPercentage,
 }: Props) => {
+  const isMobile = useIsMobile();
+
   if (error) {
     return (
       <div
@@ -38,9 +41,7 @@ export const BookComponent = ({
         font-size: 0.875rem;
         display: flex;
         width: 100%;
-        @media only screen and (max-width: 688px) {
-          flex-direction: column-reverse;
-        }
+        flex-direction: ${isMobile && "column-reverse"};
       `}
     >
       <div
@@ -62,9 +63,7 @@ export const BookComponent = ({
           > * {
             padding: 0.6rem;
           }
-          @media only screen and (min-width: 688px) {
-            display: none;
-          }
+          display: ${!isMobile && "none"};
         `}
       >
         <Spread spread={spread} spreadPercentage={spreadPercentage} />

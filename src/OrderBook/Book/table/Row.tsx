@@ -2,6 +2,7 @@
 import { css } from "@emotion/react";
 import { TotalBarSide } from ".";
 import { ROW_HEIGHT_REM } from "../../config";
+import { useIsMobile } from "../../isMobile";
 import { OrderType } from "../../types";
 import { TotalLevelBar } from "./TotalLevelBar";
 
@@ -19,40 +20,41 @@ export const Row = ({
   highestTotal,
   totalBarSide,
   children,
-}: Props) => (
-  <div
-    css={css`
-      height: ${ROW_HEIGHT_REM}rem;
-      width: 100%;
-      position: relative;
-    `}
-  >
+}: Props) => {
+  const isMobile = useIsMobile();
+  return (
     <div
       css={css`
-        width: 100%;
-        display: flex;
-        background-color: transparent;
-        position: absolute;
-        flex-direction: ${totalBarSide === TotalBarSide.LEFT
-          ? "row"
-          : "row-reverse"};
         height: ${ROW_HEIGHT_REM}rem;
-        align-items: center;
-        > * {
-          width: 33.333%;
-          text-align: end;
-        }
-        @media only screen and (max-width: 688px) {
-          flex-direction: row-reverse;
-        }
+        width: 100%;
+        position: relative;
       `}
     >
-      {children}
+      <div
+        css={css`
+          width: 100%;
+          display: flex;
+          background-color: transparent;
+          position: absolute;
+          flex-direction: ${totalBarSide === TotalBarSide.LEFT
+            ? "row"
+            : "row-reverse"};
+          height: ${ROW_HEIGHT_REM}rem;
+          align-items: center;
+          > * {
+            width: 33.333%;
+            text-align: end;
+          }
+          flex-direction: ${isMobile && "row-reverse"};
+        `}
+      >
+        {children}
+      </div>
+      <TotalLevelBar
+        orderType={orderType}
+        total={levelTotal}
+        highestTotal={highestTotal}
+      />
     </div>
-    <TotalLevelBar
-      orderType={orderType}
-      total={levelTotal}
-      highestTotal={highestTotal}
-    />
-  </div>
-);
+  );
+};

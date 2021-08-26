@@ -4,6 +4,7 @@ import { Colors } from "./config";
 import { Spread } from "./Spread";
 import { darken } from "polished";
 import { useState } from "react";
+import { useIsMobile } from "./isMobile";
 
 interface Props {
   onGroupingChange: (selectedGrouping: number) => void;
@@ -19,6 +20,8 @@ export const Header = ({
   spread,
   spreadPercentage,
 }: Props) => {
+  const isMobile = useIsMobile();
+
   return (
     <div
       css={css`
@@ -36,9 +39,7 @@ export const Header = ({
       <div
         css={css`
           justify-content: center;
-          @media only screen and (max-width: 688px) {
-            display: none;
-          }
+          display: ${isMobile && "none"};
         `}
       >
         <Spread spread={spread} spreadPercentage={spreadPercentage} />

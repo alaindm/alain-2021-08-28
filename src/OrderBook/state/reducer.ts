@@ -1,3 +1,4 @@
+import { ETH_GROUPING_OPTIONS, XBT_GROUPING_OPTIONS } from "../config";
 import { BookInfo, AppSnapshot, OrderType } from "../types";
 import { getHighestTotal } from "./helpers/get-highest-total";
 import { getLevels } from "./helpers/get-levels";
@@ -9,7 +10,8 @@ type State = {
   book: BookInfo;
   maxRowsToRender: number;
   error: string | null;
-  grouping: number;
+  groupingOptions: number[];
+  selectedGrouping: number;
   isMobile: boolean;
 };
 
@@ -25,7 +27,8 @@ export const initialState: State = {
   },
   maxRowsToRender: 0,
   error: null,
-  grouping: 0.5,
+  groupingOptions: XBT_GROUPING_OPTIONS,
+  selectedGrouping: XBT_GROUPING_OPTIONS[0],
   isMobile: true,
 };
 
@@ -46,14 +49,24 @@ export const reducer = (state: State, action: Action) => {
         connectionTrigger: !state.connectionTrigger,
       };
     case "TOGGLE_FEED":
+      const nextProductId =
+        state.productId === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD";
+
+      const nextProductIdOptions =
+        nextProductId === "PI_XBTUSD"
+          ? XBT_GROUPING_OPTIONS
+          : ETH_GROUPING_OPTIONS;
+
       return {
         ...state,
-        productId: state.productId === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD",
+        productId: nextProductId,
+        groupingOptions: nextProductIdOptions,
+        selectedGrouping: nextProductIdOptions[0],
       };
     case "CHANGE_GROUPING":
       return {
         ...state,
-        grouping: action.payload,
+        selectedGrouping: action.payload,
       };
     case "SET_ERROR":
       return {
@@ -65,7 +78,7 @@ export const reducer = (state: State, action: Action) => {
 
       const bids = getLevels(
         action.snapshot.bids,
-        state.grouping,
+        state.selectedGrouping,
         OrderType.BID,
         state.maxRowsToRender,
         state.isMobile
@@ -73,7 +86,7 @@ export const reducer = (state: State, action: Action) => {
 
       const asks = getLevels(
         action.snapshot.asks,
-        state.grouping,
+        state.selectedGrouping,
         OrderType.ASK,
         state.maxRowsToRender,
         state.isMobile

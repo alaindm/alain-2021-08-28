@@ -10,8 +10,6 @@ import {
 } from "react";
 import { BookComponent } from "./book";
 import {
-  XBT_GROUPING_OPTIONS,
-  ETH_GROUPING_OPTIONS,
   Colors,
   ROW_HEIGHT_REM,
   WS_FEED,
@@ -24,8 +22,17 @@ import { Header } from "./Header";
 import { Footer } from "./Footer";
 
 export const OrderBook = () => {
-  const [{ productId, connectionTrigger, book, error, grouping }, dispatch] =
-    useReducer(reducer, initialState);
+  const [
+    {
+      productId,
+      connectionTrigger,
+      book,
+      error,
+      groupingOptions,
+      selectedGrouping,
+    },
+    dispatch,
+  ] = useReducer(reducer, initialState);
 
   const snapshot = useRef<AppSnapshot>({ bids: new Map(), asks: new Map() });
   const webSocketConnectionRef = useRef<WebSocket>();
@@ -60,13 +67,13 @@ export const OrderBook = () => {
     };
   };
 
-  const toggleProduct = useCallback(
-    () => dispatch({ type: "TOGGLE_FEED" }),
-    []
-  );
+  const toggleProduct = useCallback(() => {
+    dispatch({ type: "TOGGLE_FEED" });
+  }, []);
 
-  const handleGroupingChange = useCallback((selectedGrouping: number) => {
-    dispatch({ type: "CHANGE_GROUPING", payload: selectedGrouping });
+  const handleGroupingChange = useCallback((selected: number) => {
+    dispatch({ type: "CHANGE_GROUPING", payload: selected });
+    dispatch({ type: "UPDATE_BOOK", snapshot: snapshot.current });
   }, []);
 
   const throwFeedError = useCallback(() => {
@@ -176,12 +183,6 @@ export const OrderBook = () => {
     // connectionTrigger dependency is necessary here to get the current ws reference
   }, [productId, connectionTrigger]);
 
-  const currentGroupingOptions = useMemo(
-    () =>
-      productId === "PI_XBTUSD" ? XBT_GROUPING_OPTIONS : ETH_GROUPING_OPTIONS,
-    [productId]
-  );
-
   return (
     <div
       css={css`
@@ -207,9 +208,9 @@ export const OrderBook = () => {
         `}
       >
         <Header
+          groupingOptions={groupingOptions}
+          selectedGrouping={selectedGrouping}
           onGroupingChange={handleGroupingChange}
-          selectedGrouping={grouping}
-          groupingOptions={currentGroupingOptions}
           spread={book.spread}
           spreadPercentage={book.spreadPercentage}
         />

@@ -3,7 +3,6 @@ import { css } from "@emotion/react";
 import { Colors } from "./config";
 import { Spread } from "./Spread";
 import { darken } from "polished";
-import { useState } from "react";
 import { useIsMobile } from "./isMobile";
 
 interface Props {
@@ -15,8 +14,9 @@ interface Props {
 }
 
 export const Header = ({
-  onGroupingChange,
   groupingOptions,
+  selectedGrouping,
+  onGroupingChange,
   spread,
   spreadPercentage,
 }: Props) => {
@@ -51,7 +51,8 @@ export const Header = ({
       >
         <GroupingSelect
           options={groupingOptions}
-          onGroupingChange={onGroupingChange}
+          value={selectedGrouping}
+          onChange={onGroupingChange}
         />
       </div>
     </div>
@@ -60,17 +61,16 @@ export const Header = ({
 
 interface GroupingSelectProps {
   options: number[];
-  onGroupingChange: (selectedGrouping: number) => void;
+  value: number;
+  onChange: (selected: number) => void;
 }
 
-const GroupingSelect = ({ options, onGroupingChange }: GroupingSelectProps) => {
-  const [selected, setSelected] = useState(options[0]);
+const GroupingSelect = ({ options, value, onChange }: GroupingSelectProps) => {
   const handleGroupingChange: React.ChangeEventHandler<HTMLSelectElement> = (
     event
   ) => {
     const selectedValue = Number(event.currentTarget.value);
-    setSelected(selectedValue);
-    onGroupingChange(selectedValue);
+    onChange(selectedValue);
   };
 
   return (
@@ -93,7 +93,7 @@ const GroupingSelect = ({ options, onGroupingChange }: GroupingSelectProps) => {
           no-repeat;
         background-position: right 5px top 60%;
       `}
-      value={selected}
+      value={value}
       onChange={handleGroupingChange}
     >
       {options.map((option) => (

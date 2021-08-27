@@ -1,4 +1,4 @@
-import { AppSnapshot } from "../../types";
+import { AppSnapshot } from "../types";
 import { RoundTo4Decimals } from "./utils";
 
 export const getSpreads = (snapshot: AppSnapshot) => {

@@ -1,9 +1,10 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
+import { Spread } from "./Spread";
+import { OrderTable } from "./OrderTable";
+import { ROW_HEIGHT_REM } from "../config";
+import { useIsMobile } from "../helpers/isMobile";
 import { BookInfo, OrderType } from "../types";
-import { Spread } from "../Spread";
-import { Table, TotalBarSide } from "./table";
-import { useIsMobile } from "../isMobile";
 
 interface Props {
   bookState: BookInfo;
@@ -12,7 +13,7 @@ interface Props {
   spreadPercentage: number;
 }
 
-export const BookComponent = ({
+export const MainArea = ({
   error,
   bookState,
   spread,
@@ -49,10 +50,9 @@ export const BookComponent = ({
           flex: 1;
         `}
       >
-        <Table
-          orderType={OrderType.BID}
-          totalBarSide={TotalBarSide.LEFT}
-          levels={bookState.bids}
+        <OrderTable
+          type={OrderType.BID}
+          items={bookState.bids}
           highestTotal={bookState.highestTotal}
         />
       </div>
@@ -60,8 +60,9 @@ export const BookComponent = ({
         css={css`
           display: flex;
           justify-content: center;
-          height: 1.7rem;
+          height: ${ROW_HEIGHT_REM}rem;
           display: ${!isMobile && "none"};
+          font-size: 0.8rem;
         `}
       >
         <Spread spread={spread} spreadPercentage={spreadPercentage} />
@@ -71,10 +72,9 @@ export const BookComponent = ({
           flex: 1;
         `}
       >
-        <Table
-          orderType={OrderType.ASK}
-          totalBarSide={TotalBarSide.RIGHT}
-          levels={bookState.asks}
+        <OrderTable
+          type={OrderType.ASK}
+          items={bookState.asks}
           highestTotal={bookState.highestTotal}
         />
       </div>

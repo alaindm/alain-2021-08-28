@@ -1,8 +1,8 @@
-import { ETH_GROUPING_OPTIONS, XBT_GROUPING_OPTIONS } from "../config";
-import { BookInfo, AppSnapshot, OrderType } from "../types";
+import { XBT_GROUPING_OPTIONS, ETH_GROUPING_OPTIONS } from "./config";
 import { getHighestTotal } from "./helpers/get-highest-total";
 import { getLevels } from "./helpers/get-levels";
 import { getSpreads } from "./helpers/get-spreads";
+import { BookInfo, AppSnapshot, OrderType } from "./types";
 
 type State = {
   productId: string;

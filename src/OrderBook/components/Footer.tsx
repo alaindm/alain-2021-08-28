@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { Colors } from "./config";
 import { darken, transparentize } from "polished";
+import { Colors } from "../config";
 
 interface Props {
   hasError: boolean;

@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { Colors } from "./config";
+import { Colors } from "../config";
 
 interface Props {
   spread: number;
@@ -11,7 +11,6 @@ export const Spread = ({ spread, spreadPercentage }: Props) => {
   return (
     <div
       css={css`
-        font-size: 0.8rem;
         color: ${Colors.LIGHT_GRAY};
       `}
     >

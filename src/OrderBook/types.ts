@@ -13,6 +13,11 @@ export type Level = {
   total: number;
 };
 
+export type AppSnapshot = {
+  bids: Map<number, number>;
+  asks: Map<number, number>;
+};
+
 export type FeedSnapshot = {
   bids: Order[];
   asks: Order[];
@@ -21,11 +26,6 @@ export type FeedSnapshot = {
 export type FeedMessage = FeedSnapshot & {
   feed: string;
   product_id: string;
-};
-
-export type AppSnapshot = {
-  bids: Map<number, number>;
-  asks: Map<number, number>;
 };
 
 export type BookInfo = {

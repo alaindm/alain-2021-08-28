@@ -1,4 +1,4 @@
-import { Level, OrderType } from "../../types";
+import { OrderType, Level } from "../types";
 
 enum SortOrder {
   ASCENDING = 1,

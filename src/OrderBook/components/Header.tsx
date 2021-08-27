@@ -1,9 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
-import { Colors } from "./config";
 import { Spread } from "./Spread";
 import { darken } from "polished";
-import { useIsMobile } from "./isMobile";
+import { Colors } from "../config";
+import { useIsMobile } from "../helpers/isMobile";
 
 interface Props {
   onGroupingChange: (selectedGrouping: number) => void;
@@ -40,6 +40,7 @@ export const Header = ({
         css={css`
           justify-content: center;
           display: ${isMobile && "none"};
+          font-size: 0.8rem;
         `}
       >
         <Spread spread={spread} spreadPercentage={spreadPercentage} />

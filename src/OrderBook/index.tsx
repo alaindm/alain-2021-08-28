@@ -4,22 +4,21 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useReducer,
   useRef,
 } from "react";
-import { BookComponent } from "./book";
+import { Footer } from "./components/Footer";
+import { Header } from "./components/Header";
+import { MainArea } from "./components/MainArea";
 import {
   Colors,
   ROW_HEIGHT_REM,
   WS_FEED,
   VIEW_UPDATE_INTERVAL,
 } from "./config";
+import { useIsMobile } from "./helpers/isMobile";
+import { reducer, initialState } from "./reducer";
 import { AppSnapshot, FeedMessage } from "./types";
-import { initialState, reducer } from "./state/reducer";
-import { useIsMobile } from "./isMobile";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
 
 export const OrderBook = () => {
   const [
@@ -39,6 +38,7 @@ export const OrderBook = () => {
   const headerElementRef = useRef<HTMLDivElement>(null);
   const footerElementRef = useRef<HTMLDivElement>(null);
 
+  // Updates as the width changes
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -46,6 +46,7 @@ export const OrderBook = () => {
   }, [isMobile]);
 
   useLayoutEffect(() => {
+    // Effect to measure the available height for the "MainArea" and the maximum of number of row it ca render without overflowing.
     const bookAreaHeight =
       window.innerHeight -
       (headerElementRef.current?.clientHeight || 0) -
@@ -77,6 +78,7 @@ export const OrderBook = () => {
   }, []);
 
   const throwFeedError = useCallback(() => {
+    // ONLY TO SIMULATE THE FEED ERROR AND TRIGGER RECONNECTION
     const ws = webSocketConnectionRef.current;
     if (!error) {
       ws && ws.close();
@@ -116,7 +118,9 @@ export const OrderBook = () => {
       if (message.feed === "book_ui_1_snapshot") {
         const { bids, asks } = message as FeedMessage;
 
+        // clears the snapshot stored so it does not mix orders of different products
         clearSnapshot();
+
         bids.forEach(([price, size]) => snapshot.current.bids.set(price, size));
         asks.forEach(([price, size]) => snapshot.current.asks.set(price, size));
 
@@ -155,9 +159,11 @@ export const OrderBook = () => {
       if (ws.readyState === ws.OPEN) ws.close();
     };
     // productId is omitted from the dependencies to prevent closing and re-opening a connection when changin the productId
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionTrigger]);
 
   useEffect(() => {
+    // Effect to handle websockets messages (subscribe/unsubscribe) when changing the selected product
     const ws = webSocketConnectionRef.current;
 
     ws &&
@@ -191,7 +197,7 @@ export const OrderBook = () => {
         grid-template-rows: auto 1fr auto;
         grid-template-areas:
           "header"
-          "book"
+          "main"
           "footer";
         height: 100vh;
         background-color: ${Colors.BLACK};
@@ -217,11 +223,11 @@ export const OrderBook = () => {
       </div>
       <div
         css={css`
-          grid-area: book;
+          grid-area: main;
           overflow: auto;
         `}
       >
-        <BookComponent
+        <MainArea
           bookState={book}
           error={error}
           spread={book.spread}

@@ -22,7 +22,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --silent",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -44,6 +44,8 @@
     ]
   },
   "devDependencies": {
+    "jest-websocket-mock": "^2.2.1",
+    "mock-socket": "^9.0.3",
     "prettier": "2.3.2"
   }
 }

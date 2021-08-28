@@ -26,8 +26,14 @@ export const Footer = ({ hasError, onToggleFeed, onKillFeed }: Props) => (
       color={Colors.VIOLET}
       onClick={() => onToggleFeed()}
       disabled={hasError}
+      data-testid="toggle-feed-button"
     />
-    <Button text="Kill Feed" color={Colors.RED} onClick={() => onKillFeed()} />
+    <Button
+      text="Kill Feed"
+      color={Colors.RED}
+      onClick={() => onKillFeed()}
+      data-testid="kill-feed-button"
+    />
   </div>
 );
 

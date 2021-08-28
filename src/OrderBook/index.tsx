@@ -145,6 +145,7 @@ export const OrderBook = () => {
     };
 
     ws.onerror = () => {
+      clearInterval(timerId);
       clearSnapshot();
       dispatch({ type: "SET_ERROR", error: "WebSocket error" });
     };
@@ -157,6 +158,7 @@ export const OrderBook = () => {
 
     return () => {
       if (ws.readyState === ws.OPEN) ws.close();
+      clearInterval(timerId);
     };
     // productId is omitted from the dependencies to prevent closing and re-opening a connection when changin the productId
     // eslint-disable-next-line react-hooks/exhaustive-deps

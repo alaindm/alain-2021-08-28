@@ -76,6 +76,7 @@ const GroupingSelect = ({ options, value, onChange }: GroupingSelectProps) => {
 
   return (
     <select
+      data-testid="grouping-select"
       css={css`
         color: ${Colors.WHITE};
         font-size: 0.8rem;

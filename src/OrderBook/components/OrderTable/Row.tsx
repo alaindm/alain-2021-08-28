@@ -28,7 +28,7 @@ export const Row = ({ type, children, style = {} }: Props) => {
           width: 28%;
           text-align: end;
         }
-        > div:first-child {
+        > div:first-of-type {
           margin-right: ${!isMobile && type === OrderType.BID && "16%"};
         }
       `}

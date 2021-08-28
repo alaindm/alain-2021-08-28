@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const Spread = ({ spread, spreadPercentage }: Props) => {
-  return (
+  return spread ? (
     <div
       css={css`
         color: ${Colors.LIGHT_GRAY};
@@ -16,10 +16,8 @@ export const Spread = ({ spread, spreadPercentage }: Props) => {
     >
       <span style={{ marginRight: "0.6rem" }}>Spread:</span>
       <span className="monospace">
-        {spread
-          ? `${spread.toFixed(2)}   (${(spreadPercentage * 100).toFixed(2)})%`
-          : `-`}
+        {`${spread.toFixed(2)}   (${(spreadPercentage * 100).toFixed(2)})%`}
       </span>
     </div>
-  );
+  ) : null;
 };

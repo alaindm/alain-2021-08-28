@@ -21,6 +21,7 @@ import { reducer, initialState } from "./reducer";
 import { AppSnapshot, FeedMessage } from "./types";
 
 export const OrderBook = () => {
+  // the reducer manages all the app state (except snapshot)
   const [
     {
       productId,
@@ -33,8 +34,13 @@ export const OrderBook = () => {
     dispatch,
   ] = useReducer(reducer, initialState);
 
+  // ref to store the updated snapshot (initial snapshot + deltas changes)
   const snapshot = useRef<AppSnapshot>({ bids: new Map(), asks: new Map() });
+
+  // active websocket connection is store in this Ref
   const webSocketConnectionRef = useRef<WebSocket>();
+
+  // Header and Footer elements Ref (used for measuring available height
   const headerElementRef = useRef<HTMLDivElement>(null);
   const footerElementRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +52,7 @@ export const OrderBook = () => {
   }, [isMobile]);
 
   useLayoutEffect(() => {
-    // Effect to measure the available height for the "MainArea" and the maximum of number of row it ca render without overflowing.
+    // Effect to measure the available height for the "MainArea" and the maximum of number of row it can render without overflowing.
     const bookAreaHeight =
       window.innerHeight -
       (headerElementRef.current?.clientHeight || 0) -
